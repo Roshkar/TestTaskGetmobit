@@ -40,7 +40,8 @@ def create_user(driver):
     driver.find_element(By.NAME, "noibiz_email").send_keys("testuser@example.com")
     driver.find_element(By.NAME, "noibiz_password").send_keys("password")
     driver.find_element(By.NAME, "noibiz_birthday").send_keys("01011990")
-
+    #avatar_input = driver.find_element(By.NAME, "noibiz_avatar")
+    #avatar_input.send_keys("D:/124142142.PNG")
     wait = WebDriverWait(driver, 10)    
     gender_select_element = wait.until(EC.visibility_of_element_located((By.NAME, "noibiz_gender")))
     gender_select = Select(gender_select_element)
@@ -91,6 +92,10 @@ def test_create_and_verify_user():
         driver.find_element(By.LINK_TEXT, "Удалить").click()
     finally:
         driver.quit()
+
+
+#if name == "main":
+#    test_create_and_verify_user()
 
 if __name__ == "__main__":
     test_create_and_verify_user()
