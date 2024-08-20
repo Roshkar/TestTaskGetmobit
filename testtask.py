@@ -3,6 +3,9 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.chrome.service import Service
 from webdriver_manager.chrome import ChromeDriverManager
+from selenium.webdriver.support.ui import Select, WebDriverWait
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
 import time
 
 
@@ -37,6 +40,28 @@ def create_user(driver):
     driver.find_element(By.NAME, "noibiz_email").send_keys("testuser@example.com")
     driver.find_element(By.NAME, "noibiz_password").send_keys("password")
     driver.find_element(By.NAME, "noibiz_birthday").send_keys("01011990")
+
+    wait = WebDriverWait(driver, 10)    
+    gender_select_element = wait.until(EC.visibility_of_element_located((By.NAME, "noibiz_gender")))
+    gender_select = Select(gender_select_element)
+    gender_select.select_by_visible_text("Женский")
+
+    driver.find_element(By.NAME, "noibiz_date_start").send_keys("01012020")
+    driver.find_element(By.NAME, "noibiz_hobby").send_keys("Волейбол")
+    driver.find_element(By.NAME, "noibiz_name1").send_keys("Пользователь")
+    driver.find_element(By.NAME, "noibiz_surname1").send_keys("Юзеров")
+    wait = WebDriverWait(driver, 10)
+    visible_input = wait.until(EC.visibility_of_element_located((By.CSS_SELECTOR, "input.form-control.numberfilter")))
+    visible_input.send_keys("Юзерович")
+    driver.find_element(By.NAME, "noibiz_cat").send_keys("да")
+    driver.find_element(By.NAME, "noibiz_dog").send_keys("да")
+    driver.find_element(By.NAME, "noibiz_parrot").send_keys("да")
+    driver.find_element(By.NAME, "noibiz_cavy").send_keys("нет")
+    driver.find_element(By.NAME, "noibiz_hamster").send_keys("нет")
+    driver.find_element(By.NAME, "noibiz_squirrel").send_keys("нет")
+    driver.find_element(By.NAME, "noibiz_phone").send_keys("89999998811")
+    driver.find_element(By.NAME, "noibiz_adres").send_keys("Московский скворечник, д2")
+    driver.find_element(By.NAME, "noibiz_inn").send_keys("872193842")
     driver.find_element(By.NAME, "act_create").click()
 
 
@@ -66,10 +91,6 @@ def test_create_and_verify_user():
         driver.find_element(By.LINK_TEXT, "Удалить").click()
     finally:
         driver.quit()
-
-
-#if name == "main":
-#    test_create_and_verify_user()
 
 if __name__ == "__main__":
     test_create_and_verify_user()
