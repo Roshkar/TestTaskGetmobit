@@ -49,7 +49,7 @@ def create_user(driver):
 
     driver.find_element(By.NAME, "noibiz_date_start").send_keys("01012020")
     driver.find_element(By.NAME, "noibiz_hobby").send_keys("Волейбол")
-    driver.find_element(By.NAME, "noibiz_name1").send_keys("Пользователь")
+    driver.find_element(By.NAME, "noibiz_name1").send_keys("Пользюк")
     driver.find_element(By.NAME, "noibiz_surname1").send_keys("Юзеров")
     wait = WebDriverWait(driver, 10)
     visible_input = wait.until(EC.visibility_of_element_located((By.CSS_SELECTOR, "input.form-control.numberfilter")))
@@ -70,6 +70,7 @@ def test_create_and_verify_user():
     service = Service(ChromeDriverManager().install())
     driver = webdriver.Chrome(service=service)
     try:
+        driver.execute_script("document.charset = 'UTF-8';")
         # Шаг 1: Вход под менеджером
         login(driver, "manager@mail.ru", "1")
         # Шаг 2: Создание нового пользователя
@@ -82,8 +83,66 @@ def test_create_and_verify_user():
         search_box.send_keys(Keys.RETURN)
         driver.find_element(By.LINK_TEXT, "Посмотреть").click()
         # Сравнение введенных данных с отображаемыми
+        wait = WebDriverWait(driver, 20)
+
         fio_value = driver.find_element(By.XPATH, "//tr[td[1]='ФИО']/td[2]").text
         assert fio_value == "Test User", f"Expected 'Test User', but got '{fio_value}'"
+
+        email_value = driver.find_element(By.XPATH, "//tr[td[1]='Email']/td[2]").text
+        assert email_value == "testuser@example.com", f"Expected 'testuser@example.com', but got '{email_value}'"
+
+        birthday_value = driver.find_element(By.XPATH, "//tr[td[1]='Дата рождения']/td[2]").text
+        assert birthday_value == "1990-01-01", f"Expected '1990-01-01', but got '{birthday_value}'"
+        
+        gender_value = driver.execute_script("""
+            var element = document.evaluate("//tr[td[1]='Пол']/td[2]", document, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue;
+            return element ? element.innerText : '';
+        """).strip()
+        gender_value_cleaned = ' '.join(gender_value.split()).replace('\n', '').replace('  ', ' ')
+        assert 'Женский' in gender_value_cleaned, f"Expected 'Женский', but got '{gender_value_cleaned}'"
+
+        date_start_value = driver.find_element(By.XPATH, "//tr[td[text()='Начал работать в компании']]/td[2]").text
+        assert date_start_value == "2020-01-01", f"Expected '2020-01-01', but got '{date_start_value}'"
+        
+        hobby_value = driver.find_element(By.XPATH, "//tr[td[text()='Хобби']]/td/textarea[@name='hobby']").text
+        assert hobby_value == "Волейбол", f"Expected 'Волейбол', but got '{hobby_value}'"
+        
+        name1_value = driver.find_element(By.XPATH, "//tr[td[text()='имя1']]/td[2]").text
+        assert name1_value == "Пользюк", f"Expected 'Пользюк', but got '{name1_value}'"
+        
+        surname1_value = driver.find_element(By.XPATH, "//tr[td[text()='фамилия1']]/td[2]").text
+        assert surname1_value == "Юзеров", f"Expected 'Юзеров', but got '{surname1_value}'"
+        
+        patronymic_value = driver.find_element(By.XPATH, "//tr[td[text()='отчество1']]/td[2]").text
+        assert patronymic_value == "Юзерович", f"Expected 'Юзерович', but got '{patronymic_value}'"
+        
+        cat_value = driver.find_element(By.XPATH, "//tr[td[text()='Кошечка']]/td[2]").text
+        assert cat_value == "да", f"Expected 'да', but got '{cat_value}'"
+        
+        dog_value = driver.find_element(By.XPATH, "//tr[td[text()='Собачка']]/td[2]").text
+        assert dog_value == "да", f"Expected 'да', but got '{dog_value}'"
+        
+        parrot_value = driver.find_element(By.XPATH, "//tr[td[text()='Попугайчик']]/td[2]").text
+        assert parrot_value == "да", f"Expected 'да', but got '{parrot_value}'"
+        
+        cavy_value = driver.find_element(By.XPATH, "//tr[td[text()='Морская свинка']]/td[2]").text
+        assert cavy_value == "нет", f"Expected 'нет', but got '{cavy_value}'"
+        
+        hamster_value = driver.find_element(By.XPATH, "//tr[td[text()='Хомячок']]/td[2]").text
+        assert hamster_value == "нет", f"Expected 'нет', but got '{hamster_value}'"
+        
+        squirrel_value = driver.find_element(By.XPATH, "//tr[td[text()='Белочка']]/td[2]").text
+        assert squirrel_value == "нет", f"Expected 'нет', but got '{squirrel_value}'"
+        
+        phone_value = driver.find_element(By.XPATH, "//tr[td[text()='Телефон']]/td[2]").text
+        assert phone_value == "89999998811", f"Expected '89999998811', but got '{phone_value}'"
+        
+        address_value = driver.find_element(By.XPATH, "//tr[td[text()='Адрес']]/td[2]").text
+        assert address_value == "Московский скворечник, д2", f"Expected 'Московский скворечник, д2', but got '{address_value}'"
+        
+        inn_value = driver.find_element(By.XPATH, "//tr[td[text()='ИНН']]/td[2]").text
+        assert inn_value == "872193842", f"Expected '872193842', but got '{inn_value}'"
+
         # Шаг 5: Удаление пользователя
         login(driver, "manager@mail.ru", "1")
         search_box = driver.find_element(By.NAME, "q")
@@ -93,9 +152,6 @@ def test_create_and_verify_user():
     finally:
         driver.quit()
 
-
-#if name == "main":
-#    test_create_and_verify_user()
 
 if __name__ == "__main__":
     test_create_and_verify_user()
